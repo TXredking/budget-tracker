@@ -1,65 +1,128 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import PlaidLinkButton from '@/components/PlaidLinkButton';
+import Dashboard from '@/components/Dashboard';
+import { categorizeTransactions } from '@/lib/categorize';
+import { compareToBudget, BudgetComparison } from '@/lib/budgets';
+import TrendView from '@/components/TrendView';
+import { calculateTrends, MonthlyTrend } from '@/lib/trends';
 
 export default function Home() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [budgetData, setBudgetData] = useState<BudgetComparison[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Store trend data for the month-over-month view
+  const [trends, setTrends] = useState<{
+    trends: MonthlyTrend[];
+    hasEnoughData: boolean;
+  } | null>(null);
+  // Track which view is active
+  const [view, setView] = useState<'budget' | 'trend'>('budget');
+
+  async function handleSync() {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Fetch transactions from your API route
+      const response = await fetch('/api/transactions');
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to sync transactions');
+        return;
+      }
+
+      // Categorize transactions and compare to budget targets
+      const categories = categorizeTransactions(data.added);
+      const comparisons = compareToBudget(categories);
+      setBudgetData(comparisons);
+      // Calculate month-over-month trends from the same data
+      const trendData = calculateTrends(data.added);
+      setTrends(trendData);
+    } catch (err) {
+      setError('Failed to fetch transactions. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="min-h-screen bg-gray-50 p-8">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="mb-8 text-3xl font-bold text-gray-900">
+          Budget Tracker
+        </h1>
+
+        {/* State 1: No bank account connected yet */}
+        {!isConnected ? (
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-12 shadow">
+            <h2 className="text-xl font-semibold text-gray-700">
+              Connect your bank account to get started
+            </h2>
+            <p className="text-gray-500 mb-4">
+              Uses Plaid Sandbox with test data. No real bank data is accessed.
+            </p>
+            <PlaidLinkButton onConnected={() => setIsConnected(true)} />
+          </div>
+        ) : !budgetData ? (
+          // State 2: Connected but transactions not synced yet
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-12 shadow">
+            <h2 className="text-xl font-semibold text-gray-700">
+              Bank account connected!
+            </h2>
+            <button
+              onClick={handleSync}
+              disabled={loading}
+              className="rounded-lg bg-green-600 px-6 py-3 text-white font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              {loading ? 'Syncing...' : 'Sync Transactions'}
+            </button>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </div>
+     ) : (
+      <div>
+        {/* Toggle buttons for switching views */}
+        <div className="mb-6 flex gap-2">
+          <button
+            onClick={() => setView('budget')}
+            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+              view === 'budget'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'
+            }`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            Budget View
+          </button>
+          <button
+            onClick={() => setView('trend')}
+            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+              view === 'trend'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            Trend View
+          </button>
+        </div>
+
+        {/* Render the active view */}
+        {view === 'budget' ? (
+          <Dashboard budgetData={budgetData} />
+        ) : (
+          trends && (
+            <TrendView
+              trends={trends.trends}
+              hasEnoughData={trends.hasEnoughData}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          )
+        )}
+      </div>
+    )}
+      </div>
+    </main>
   );
 }
