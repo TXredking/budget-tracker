@@ -14,9 +14,10 @@ Create a `.env.local` file at the project root:
 ```
 PLAID_CLIENT_ID=your_client_id
 PLAID_SECRET=your_sandbox_secret
+PLAID_ENV=sandbox
 ```
 
-Both values are available in the [Plaid Dashboard](https://dashboard.plaid.com) under Team Settings → Keys.
+`PLAID_CLIENT_ID` and `PLAID_SECRET` are available in the [Plaid Dashboard](https://dashboard.plaid.com) under Team Settings → Keys. `PLAID_ENV` accepts `sandbox`, `development`, or `production`; defaults to `sandbox` if omitted.
 
 ## Local development
 
