@@ -30,7 +30,7 @@ export function categorizeTransactions(
   const summaries: CategorySummary[] = [];
 
   for (const [category, txns] of categoryMap) {
-    const total = txns.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const total = txns.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
     summaries.push({ category, total, transactions: txns });
   }
 

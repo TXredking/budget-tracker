@@ -31,10 +31,11 @@ export function calculateTrends(transactions: Transaction[]): {
     if (!monthMap.has(monthKey)) {
       monthMap.set(monthKey, new Map());
     }
+    if (txn.amount <= 0) continue;
     const categoryMap = monthMap.get(monthKey)!;
     categoryMap.set(
       category,
-      (categoryMap.get(category) || 0) + Math.abs(txn.amount)
+      (categoryMap.get(category) || 0) + txn.amount
     );
   }
 
