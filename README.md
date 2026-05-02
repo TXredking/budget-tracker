@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Budget Tracker
 
-## Getting Started
+Personal finance dashboard built with Next.js and Plaid. Connects to a bank account via Plaid, syncs transactions, and shows spending by category with month-over-month trends.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+
+- A [Plaid](https://plaid.com) account with Sandbox credentials
+
+## Environment variables
+
+Create a `.env.local` file at the project root:
+
+```
+PLAID_CLIENT_ID=your_client_id
+PLAID_SECRET=your_sandbox_secret
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Both values are available in the [Plaid Dashboard](https://dashboard.plaid.com) under Team Settings → Keys.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+The app runs against the Plaid Sandbox environment. Use Plaid's [test credentials](https://plaid.com/docs/sandbox/test-credentials/) when prompted by the bank connection flow — no real bank account is needed or accessed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/
+    page.tsx                  # Main UI — connection flow and dashboard state
+    api/
+      create-link-token/      # POST — generates a Plaid Link token
+      exchange-token/         # POST — exchanges public token for access token
+      transactions/           # GET  — syncs transactions from Plaid
+  components/
+    PlaidLinkButton.tsx       # Plaid Link modal integration
+    Dashboard.tsx             # Budget vs. actual spend view
+    TrendView.tsx             # Month-over-month trend view
+  lib/
+    plaid.ts                  # Plaid SDK client
+    store.ts                  # In-memory token/cursor store (demo only)
+    categorize.ts             # Groups transactions by Plaid category
+    budgets.ts                # Compares category spend to hardcoded monthly budgets
+    trends.ts                 # Calculates month-over-month % change per category
+```
 
-## Deploy on Vercel
+## Known limitations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is a demo. The in-memory store in `src/lib/store.ts` resets on every server restart and is not suitable for production use. See `docs/spec.md` for the planned persistence and multi-account roadmap.

@@ -1,4 +1,3 @@
-// Shape of a transaction from the Plaid API
 interface Transaction {
   name: string;
   amount: number;
@@ -9,7 +8,6 @@ interface Transaction {
   } | null;
 }
 
-// Shape of the grouped output per category
 export interface CategorySummary {
   category: string;
   total: number;
@@ -19,7 +17,6 @@ export interface CategorySummary {
 export function categorizeTransactions(
   transactions: Transaction[]
 ): CategorySummary[] {
-  // Group transactions by their primary spending category
   const categoryMap = new Map<string, Transaction[]>();
 
   for (const txn of transactions) {
@@ -30,7 +27,6 @@ export function categorizeTransactions(
     categoryMap.set(category, existing);
   }
 
-  // Build summaries with absolute amounts and sort by highest spend
   const summaries: CategorySummary[] = [];
 
   for (const [category, txns] of categoryMap) {

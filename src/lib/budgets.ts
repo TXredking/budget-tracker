@@ -1,6 +1,5 @@
 import { CategorySummary } from './categorize';
 
-// Monthly spending limits per category
 const MONTHLY_BUDGETS: Record<string, number> = {
   FOOD_AND_DRINK: 500,
   TRANSPORTATION: 200,
@@ -12,7 +11,6 @@ const MONTHLY_BUDGETS: Record<string, number> = {
   GENERAL_SERVICES: 200,
 };
 
-// Fallback budget for categories not listed above
 const DEFAULT_BUDGET = 250;
 
 export interface BudgetComparison {
@@ -27,7 +25,6 @@ export function compareToBudget(
   categories: CategorySummary[]
 ): BudgetComparison[] {
   return categories.map(({ category, total }) => {
-    // Look up the budget for this category, or use the default
     const budget = MONTHLY_BUDGETS[category] || DEFAULT_BUDGET;
     const remaining = budget - total;
     const percentUsed = Math.round((total / budget) * 100);

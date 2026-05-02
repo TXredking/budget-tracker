@@ -20,7 +20,7 @@ export function calculateTrends(transactions: Transaction[]): {
   trends: MonthlyTrend[];
   hasEnoughData: boolean;
 } {
-  // Group transactions by month using the YYYY-MM prefix of the date
+  // monthKey is the YYYY-MM prefix of the transaction date
   const monthMap = new Map<string, Map<string, number>>();
 
   for (const txn of transactions) {
@@ -38,10 +38,8 @@ export function calculateTrends(transactions: Transaction[]): {
     );
   }
 
-  // Sort months descending to find current and previous
   const months = Array.from(monthMap.keys()).sort().reverse();
 
-  // Need at least two months to show trends
   if (months.length < 2) {
     return { trends: [], hasEnoughData: false };
   }
@@ -49,7 +47,6 @@ export function calculateTrends(transactions: Transaction[]): {
   const currentMonthData = monthMap.get(months[0])!;
   const previousMonthData = monthMap.get(months[1])!;
 
-  // Collect all categories from both months
   const allCategories = new Set([
     ...currentMonthData.keys(),
     ...previousMonthData.keys(),
@@ -63,7 +60,6 @@ export function calculateTrends(transactions: Transaction[]): {
     const previous =
       Math.round((previousMonthData.get(category) || 0) * 100) / 100;
 
-    // Calculate percentage change (null if no previous spending)
     let percentChange: number | null = null;
     if (previous > 0) {
       percentChange = Math.round(
@@ -80,7 +76,6 @@ export function calculateTrends(transactions: Transaction[]): {
     });
   }
 
-  // Sort by current month spending, highest first
   trends.sort((a, b) => b.currentMonth - a.currentMonth);
 
   return { trends, hasEnoughData: true };
