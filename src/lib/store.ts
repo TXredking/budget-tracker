@@ -14,6 +14,6 @@ export function getCursor() {
   return cursor;
 }
 
-export function setCursor(newCursor: string) {
+export function setCursor(newCursor: string | null) {
   cursor = newCursor;
 }

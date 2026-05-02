@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { plaidClient } from '@/lib/plaid';
-import { setAccessToken } from '@/lib/store';
+import { setAccessToken, setCursor } from '@/lib/store';
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
     const accessToken = response.data.access_token;
     setAccessToken(accessToken);
+    setCursor(null);
 
     console.log('Access token stored successfully');
 
