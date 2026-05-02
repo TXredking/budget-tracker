@@ -31,13 +31,13 @@ v1 is a functional single-account Plaid Sandbox demo. The following is complete 
 
 ---
 
-## Remaining — 3 Fixes
+## Fixes — All Done ✓
 
-Standalone bug fixes from `docs/review.md`. No dependencies between them — any order works.
+All three fixes shipped. An additional bug was discovered and fixed during PR 1 (see note below).
 
 ---
 
-## PR 1 — fix/plaid-link-error-handling
+## ~~PR 1 — fix/plaid-link-error-handling~~ *(Done — commit 48d6c54)*
 
 **What**: `PlaidLinkButton` never checks `response.ok` on either API call. A failed link token fetch silently passes `undefined` to Plaid Link; a failed token exchange silently calls `onConnected()` and marks the account as connected when it isn't.
 
@@ -58,9 +58,11 @@ Standalone bug fixes from `docs/review.md`. No dependencies between them — any
 **Depends on**: none
 **Size**: S
 
+> **Bonus fix (same commit)**: `exchange-token/route.ts` was not resetting the sync cursor when storing a new access token. A stale cursor from a previous Plaid item caused 400 errors on the next `transactionsSync` call after reconnecting. `setCursor(null)` now called alongside `setAccessToken`; `setCursor` updated to accept `string | null`.
+
 ---
 
-## PR 2 — fix/transaction-sign-handling
+## ~~PR 2 — fix/transaction-sign-handling~~ *(Done — commit 5cc5701)*
 
 **What**: `categorize.ts` and `trends.ts` both use `Math.abs(txn.amount)`, which counts refunds, income, and credits as spending. In Plaid's convention positive amounts are debits (money out) and negative amounts are credits (money in). Spend calculations should include only outflows.
 
@@ -89,7 +91,7 @@ Standalone bug fixes from `docs/review.md`. No dependencies between them — any
 
 ---
 
-## PR 3 — fix/plaid-env-config
+## ~~PR 3 — fix/plaid-env-config~~ *(Done — commit 36267a3)*
 
 **What**: `plaid.ts` hardcodes `PlaidEnvironments.sandbox` and uses non-null assertions (`!`) on env vars with no validation. v2 requires production Plaid credentials — this must be configurable before that work starts.
 

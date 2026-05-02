@@ -426,14 +426,16 @@ Same category, completely different financial treatment. The category handles ma
 
 ## Tech Stack (v2+)
 
-| Layer | Choice | Reason |
-|---|---|---|
-| Framework | Next.js 16 (App Router) | Current |
-| DB | SQLite via `better-sqlite3` | Local-first, zero infra |
-| ORM | Drizzle ORM | Lightweight, good SQLite support, type-safe |
-| Bank data | Plaid (production tier) | Confirmed coverage for all four institutions |
-| Styling | Tailwind CSS 4 | Current |
-| Auth | None (single-user local app) | No need |
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router), React 19, TypeScript 5 |
+| DB | SQLite via `better-sqlite3` |
+| ORM | Drizzle ORM |
+| Bank data | Plaid (production tier) |
+| Styling | Tailwind CSS 4 |
+| Auth | None (single-user local app) |
+
+For the rationale behind the Drizzle choice and the v2 DB schema, see `docs/design.md`.
 
 ---
 

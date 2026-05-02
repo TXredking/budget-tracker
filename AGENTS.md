@@ -8,6 +8,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 This is a local-first personal finance app. Before writing any code, read:
 - `docs/spec.md` — vision, guiding principles, full feature roadmap, and data model
+- `docs/design.md` — architectural decisions (ORM choice, navigation structure) and v2 implementation details (DB schema, route structure, component states)
 - `docs/review-2026-05-02.md` — known issues and their status (superseded vs. still valid)
 - The relevant `docs/plan-v*.md` for the version being worked on
 
