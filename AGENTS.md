@@ -25,3 +25,7 @@ This is a local-first personal finance app. Before writing any code, read:
 - No comments that narrate obvious code — only comments for non-obvious constraints or caveats
 - Transactions use Plaid's sign convention: positive = outflow (debit), negative = inflow (credit/refund)
 - Primary category (from Plaid) is an internal field for math; user-facing classification uses overhead type + tags
+
+## Wrapping Up
+
+When a piece of work leaves uncommitted or unstaged changes in this repo, ask whether they should be committed before ending the turn. Don't commit automatically.
